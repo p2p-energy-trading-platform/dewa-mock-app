@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { linkRequests } from '../../data/linkRequests'
+import { approveLinkRequest, rejectLinkRequest } from '../../services/dewaApi'
+import type { LinkRequestStatus } from '../../types/dewa'
 
 
 export const Route = createFileRoute('/requests/$requestId')({
@@ -12,6 +15,8 @@ function RequestDetails() {
     const { requestId } = Route.useParams()
 
     const request = linkRequests.find((linkRequest) => linkRequest.requestId === requestId)
+
+    const [status, setStatus] = useState<LinkRequestStatus>(request?.status ?? 'PENDING')
 
     if(!request) {
         return <p>Request not found</p>
@@ -55,8 +60,42 @@ function RequestDetails() {
                         </p>
 
                         <p>
-                            <strong>Status:</strong> {request.status}
+                            <strong>Status:</strong> {status}
                         </p>
+
+                        <div className="mt-6">
+
+                            <button onClick={() => {
+
+                                    const updatedRequest = approveLinkRequest(request.requestId)
+
+                                    if (updatedRequest) {
+                                        setStatus(updatedRequest.status)
+                                    }
+
+                                }}
+
+                                className="rounded-md bg-green-600 px-4 py-2 text-white"
+                            >
+                                Approve
+                            </button>
+
+                            <button onClick={() => {
+                                    
+                                    const updatedRequest = rejectLinkRequest(request.requestId)
+
+                                    if (updatedRequest) {
+                                        setStatus(updatedRequest.status)
+                                    }
+
+                                }}
+                                
+                                className="ml-3 rounded-md bg-red-600 px-4 py-2 text-white"
+                            >
+                                Reject
+                            </button>
+
+                        </div>
 
                     </div>
 
