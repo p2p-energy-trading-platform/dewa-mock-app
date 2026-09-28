@@ -1,12 +1,17 @@
+import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { linkRequests } from '../data/linkRequests'
+import type { LinkRequestStatus } from '../types/dewa'
 
 export const Route = createFileRoute('/')({
   component: Home,
 })
 
 function Home() {
+
   const request = linkRequests[0]
+
+  const [status, setStatus] = useState<LinkRequestStatus>(request.status)
 
   return (
     <main className="min-h-screen bg-gray-100 p-8">
@@ -42,16 +47,22 @@ function Home() {
             </p>
 
             <p>
-              <strong>Status:</strong> {request.status}
+              <strong>Status:</strong> {status}
             </p>
           </div>
 
           <div className="mt-6 flex gap-3">
-            <button className="rounded-md bg-green-600 px-4 py-2 text-white">
+            <button
+              onClick={() => setStatus('APPROVED')}
+              className="rounded-md bg-green-600 px-4 py-2 text-white"
+            >
               Approve
             </button>
 
-            <button className="rounded-md bg-red-600 px-4 py-2 text-white">
+            <button
+              onClick={() => setStatus('REJECTED')}
+              className="rounded-md bg-red-600 px-4 py-2 text-white"
+            >
               Reject
             </button>
           </div>
