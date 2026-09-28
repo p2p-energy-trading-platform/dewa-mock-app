@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { linkRequests } from '../data/linkRequests'
+import { approveLinkRequest, rejectLinkRequest } from '../services/dewaApi'
 import type { LinkRequestStatus } from '../types/dewa'
 
 export const Route = createFileRoute('/')({
@@ -53,14 +54,30 @@ function Home() {
 
           <div className="mt-6 flex gap-3">
             <button
-              onClick={() => setStatus('APPROVED')}
+              onClick={() => {
+
+                const updatedRequest = approveLinkRequest(request.requestId)
+
+                if(updatedRequest) {
+                  setStatus(updatedRequest.status)
+                }
+
+              }}
               className="rounded-md bg-green-600 px-4 py-2 text-white"
             >
               Approve
             </button>
 
             <button
-              onClick={() => setStatus('REJECTED')}
+              onClick={() => {
+
+                const updatedRequest = rejectLinkRequest(request.requestId)
+
+                if(updatedRequest) {
+                  setStatus(updatedRequest.status)
+                }
+
+              }}
               className="rounded-md bg-red-600 px-4 py-2 text-white"
             >
               Reject
