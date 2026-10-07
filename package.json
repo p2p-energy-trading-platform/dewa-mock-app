@@ -33,7 +33,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.0.1",
-    "eslint": "^9.20.0",
+    "eslint": "^10.12.0",
     "husky": "^9.1.7",
     "prettier": "^3.8.1",
     "typescript": "^6.0.2",
@@ -44,5 +44,8 @@
       "esbuild",
       "lightningcss"
     ]
+  },
+  "allowScripts": {
+    "unrs-resolver@1.12.2": true
   }
 }
