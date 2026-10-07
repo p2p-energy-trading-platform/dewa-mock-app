@@ -1,34 +1,30 @@
 import { linkRequests } from '../data/linkRequests'
 import type { LinkRequest } from '../types/dewa'
 
-export function getLinkRequest(requestId: string): LinkRequest| undefined {
-    return linkRequests.find((request) => request.requestId === requestId)
+export function getLinkRequest(requestId: string): LinkRequest | undefined {
+  return linkRequests.find((request) => request.requestId === requestId)
 }
 
 export function approveLinkRequest(requestId: string): LinkRequest | undefined {
+  const request = getLinkRequest(requestId)
 
-    const request = getLinkRequest(requestId)
+  if (!request) {
+    return undefined
+  }
 
-    if(!request) {
-        return undefined
-    }
+  request.status = 'APPROVED'
 
-    request.status = 'APPROVED'
-
-    return request
-
+  return request
 }
 
 export function rejectLinkRequest(requestId: string): LinkRequest | undefined {
+  const request = getLinkRequest(requestId)
 
-    const request = getLinkRequest(requestId)
+  if (!request) {
+    return undefined
+  }
 
-    if (!request) {
-        return undefined
-    }
+  request.status = 'REJECTED'
 
-    request.status = 'REJECTED'
-
-    return request
-    
+  return request
 }
