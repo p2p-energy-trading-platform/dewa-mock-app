@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Search, SlidersHorizontal } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { Header } from '../components/Header'
 import { LinkRequestCard } from '../components/link-requests/LinkRequestCard'
@@ -14,15 +15,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select'
-import { linkRequests } from '../data/linkRequests'
+import { getLinkRequests, linkRequestsQueryKey } from '../services/dewaApi'
 import type { LinkRequest, LinkRequestStatus } from '../types/dewa'
 
 export const Route = createFileRoute('/')({
+  ssr: false,
   component: Home,
 })
 
 function Home() {
-  const [requests, setRequests] = useState(linkRequests)
+  const {
+    data: requests = [],
+    error,
+    isError,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: linkRequestsQueryKey,
+    queryFn: ({ signal }) => getLinkRequests(signal),
+    refetchInterval: 5_000,
+  })
   const [selectedRequest, setSelectedRequest] = useState<LinkRequest | null>(
     null,
   )
@@ -135,7 +147,26 @@ function Home() {
           )}
         </div>
 
-        {filteredRequests.length > 0 ? (
+        {isLoading ? (
+          <div className="mt-4 rounded-xl border border-slate-200 bg-white px-6 py-16 text-center text-sm text-slate-500">
+            Loading connection requests…
+          </div>
+        ) : isError ? (
+          <div
+            role="alert"
+            className="mt-4 flex flex-col items-center gap-3 rounded-xl border border-rose-200 bg-white px-6 py-12 text-center"
+          >
+            <p className="font-medium text-rose-700">
+              Could not load connection requests.
+            </p>
+            <p className="text-sm text-slate-500">
+              {error instanceof Error ? error.message : 'Please try again.'}
+            </p>
+            <Button variant="outline" onClick={() => void refetch()}>
+              Retry
+            </Button>
+          </div>
+        ) : filteredRequests.length > 0 ? (
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             {filteredRequests.map((request) => (
               <LinkRequestCard
@@ -159,15 +190,7 @@ function Home() {
           onOpenChange={(open) => {
             if (!open) setSelectedRequest(null)
           }}
-          onStatusChange={(updatedRequest) => {
-            setRequests((currentRequests) =>
-              currentRequests.map((request) =>
-                request.requestId === updatedRequest.requestId
-                  ? { ...updatedRequest }
-                  : request,
-              ),
-            )
-          }}
+          onStatusChange={setSelectedRequest}
         />
       </div>
     </main>

@@ -6,4 +6,5 @@ export interface LinkRequest {
   meterId: string
   userReference: string
   status: LinkRequestStatus
+  createdAt?: string
 }
