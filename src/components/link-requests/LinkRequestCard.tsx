@@ -16,10 +16,7 @@ export function LinkRequestCard({
     <Card className="border-slate-200 shadow-sm transition-shadow hover:shadow-md">
       <CardHeader className="flex-row items-start justify-between gap-4 space-y-0 pb-4">
         <div>
-          <p className="font-mono text-xs font-medium text-slate-500">
-            {request.requestId}
-          </p>
-          <h2 className="mt-1 text-base font-semibold text-slate-950">
+          <h2 className="text-base font-semibold text-slate-950">
             Smart meter connection
           </h2>
         </div>

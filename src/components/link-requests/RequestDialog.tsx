@@ -89,9 +89,6 @@ export function RequestDialog({
         <div className="bg-slate-50 px-6 py-6">
           <DialogHeader>
             <div className="mb-3 flex items-center justify-between pr-8">
-              <p className="font-mono text-xs font-medium text-slate-500">
-                {request.requestId}
-              </p>
               <StatusBadge status={status} />
             </div>
             <DialogTitle className="text-xl text-slate-950">

@@ -87,9 +87,6 @@ function RequestDetails() {
 
           <div className="mt-6 space-y-3">
             <p>
-              <strong>Request ID:</strong> {requestId}
-            </p>
-            <p>
               <strong>Registration ID:</strong> {request.registrationId}
             </p>
             <p>

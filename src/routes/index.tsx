@@ -52,7 +52,6 @@ function Home() {
       const matchesSearch =
         !normalizedSearch ||
         [
-          request.requestId,
           request.registrationId,
           request.meterId,
           request.userReference,
@@ -99,7 +98,7 @@ function Home() {
             <Input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by request, meter, or registration ID"
+              placeholder="Search by meter, registration ID, or user reference"
               className="border-0 pl-9 shadow-none focus-visible:ring-0"
             />
           </div>
