@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { CheckCircle2, Info, XCircle } from 'lucide-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Dialog,
   DialogContent,
@@ -9,7 +10,13 @@ import {
   DialogTitle,
 } from '#/components/ui/dialog'
 import { Separator } from '#/components/ui/separator'
-import { approveLinkRequest, rejectLinkRequest } from '#/services/dewaApi'
+import {
+  approveLinkRequest,
+  linkRequestQueryKey,
+  linkRequestsQueryKey,
+  rejectLinkRequest,
+} from '#/services/dewaApi'
+import type { LinkRequestStatusResponse } from '#/services/dewaApi'
 import type { LinkRequest, LinkRequestStatus } from '#/types/dewa'
 import { ApprovalActions } from './ApprovalActions'
 import { LinkRequestStatus as StatusBadge } from './LinkRequestStatus'
@@ -25,9 +32,46 @@ export function RequestDialog({
   onOpenChange: (open: boolean) => void
   onStatusChange: (request: LinkRequest) => void
 }) {
+  const queryClient = useQueryClient()
   const [status, setStatus] = useState<LinkRequestStatus>(
     request?.status ?? 'PENDING',
   )
+  const decisionMutation = useMutation({
+    mutationFn: ({
+      requestId,
+      decision,
+    }: {
+      requestId: string
+      decision: 'approve' | 'reject'
+    }) =>
+      decision === 'approve'
+        ? approveLinkRequest(requestId)
+        : rejectLinkRequest(requestId),
+    onSuccess: async (result, variables) => {
+      if (request?.requestId === variables.requestId) {
+        const updatedRequest = { ...request, status: result.status }
+        setStatus(result.status)
+        onStatusChange(updatedRequest)
+      }
+
+      queryClient.setQueryData<LinkRequest[]>(
+        linkRequestsQueryKey,
+        (requests) =>
+          requests?.map((item) =>
+            item.requestId === variables.requestId
+              ? { ...item, status: result.status }
+              : item,
+          ),
+      )
+      queryClient.setQueryData<LinkRequestStatusResponse>(
+        linkRequestQueryKey(variables.requestId),
+        (current) =>
+          current ? { ...current, status: result.status } : current,
+      )
+
+      await queryClient.invalidateQueries({ queryKey: linkRequestsQueryKey })
+    },
+  })
 
   useEffect(() => {
     setStatus(request?.status ?? 'PENDING')
@@ -35,18 +79,6 @@ export function RequestDialog({
 
   if (!request) {
     return null
-  }
-
-  const handleDecision = (decision: 'approve' | 'reject') => {
-    const updatedRequest =
-      decision === 'approve'
-        ? approveLinkRequest(request.requestId)
-        : rejectLinkRequest(request.requestId)
-
-    if (updatedRequest) {
-      setStatus(updatedRequest.status)
-      onStatusChange(updatedRequest)
-    }
   }
 
   const isPending = status === 'PENDING'
@@ -81,6 +113,13 @@ export function RequestDialog({
             <Info className="mt-0.5 size-4 shrink-0" />
             <p>Approving links this meter to the requesting user account.</p>
           </div>
+          {decisionMutation.isError && (
+            <p role="alert" className="text-sm font-medium text-rose-700">
+              {decisionMutation.error instanceof Error
+                ? decisionMutation.error.message
+                : 'Could not update this request. Please try again.'}
+            </p>
+          )}
           {!isPending && (
             <div
               className={`flex items-center gap-2 text-sm font-medium ${
@@ -102,9 +141,19 @@ export function RequestDialog({
             DEWA mock workflow
           </p>
           <ApprovalActions
-            onApprove={() => handleDecision('approve')}
-            onReject={() => handleDecision('reject')}
-            disabled={!isPending}
+            onApprove={() =>
+              decisionMutation.mutate({
+                requestId: request.requestId,
+                decision: 'approve',
+              })
+            }
+            onReject={() =>
+              decisionMutation.mutate({
+                requestId: request.requestId,
+                decision: 'reject',
+              })
+            }
+            disabled={!isPending || decisionMutation.isPending}
           />
         </DialogFooter>
       </DialogContent>
