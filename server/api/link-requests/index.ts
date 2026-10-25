@@ -1,8 +1,7 @@
 import {
-  createError,
+  HTTPError,
   defineEventHandler,
   readBody,
-  setResponseStatus,
 } from 'nitro/h3'
 
 import { addLinkRequest, getAllLinkRequests } from '../../state/memoryStore'
@@ -31,31 +30,31 @@ function isCreateLinkRequestBody(body: unknown): body is CreateLinkRequestBody {
 }
 
 export default defineEventHandler(async (event) => {
-  if (event.method === 'GET') {
+  if (event.req.method === 'GET') {
     return getAllLinkRequests()
   }
 
-  if (event.method !== 'POST') {
-    throw createError({ status: 405, statusText: 'Method Not Allowed' })
+  if (event.req.method !== 'POST') {
+    throw new HTTPError({ status: 405, statusText: 'Method Not Allowed' })
   }
 
   const body = await readBody<unknown>(event)
 
   if (!isCreateLinkRequestBody(body)) {
-    throw createError({
+    throw new HTTPError({
       status: 400,
       statusText: 'Bad Request',
       message: 'registrationId, meterId, and userReference are required.',
     })
   }
 
-  addLinkRequest({
+  const newLinkRequest = addLinkRequest({
     registrationId: body.registrationId.trim(),
     meterId: body.meterId.trim(),
     userReference: body.userReference.trim(),
   })
 
-  setResponseStatus(event, 201)
+  event.res.status = 201;
 
-  return { status: 'PENDING', message: 'Link request created' }
+  return { requestId: newLinkRequest.requestId, status: 'PENDING', message: 'Link request created' }
 })
