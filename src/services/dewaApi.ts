@@ -14,6 +14,7 @@ export interface NewLinkRequest {
 }
 
 export interface CreateLinkRequestResponse {
+  requestId: string;
   status: 'PENDING'
   message: string
 }

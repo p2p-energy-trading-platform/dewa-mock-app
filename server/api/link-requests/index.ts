@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  addLinkRequest({
+  const newLinkRequest = addLinkRequest({
     registrationId: body.registrationId.trim(),
     meterId: body.meterId.trim(),
     userReference: body.userReference.trim(),
@@ -56,5 +56,5 @@ export default defineEventHandler(async (event) => {
 
   event.res.status = 201;
 
-  return { status: 'PENDING', message: 'Link request created' }
+  return { requestId: newLinkRequest.requestId, status: 'PENDING', message: 'Link request created' }
 })
