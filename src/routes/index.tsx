@@ -171,6 +171,7 @@ function Home() {
               onClick={() => {
                 setSearch('')
                 setStatusFilter('ALL')
+                setCurrentPage(1)
               }}
               className="text-blue-600 hover:text-blue-700"
             >
