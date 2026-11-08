@@ -205,7 +205,7 @@ function Home() {
           </div>
         ) : filteredRequests.length > 0 ? (
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {filteredRequests.map((request) => (
+            {paginatedRequests.map((request) => (
               <LinkRequestCard
                 key={request.requestId}
                 request={request}
