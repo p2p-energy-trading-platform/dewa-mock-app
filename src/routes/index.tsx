@@ -68,6 +68,24 @@ function Home() {
     })
   }, [requests, search, statusFilter])
 
+
+
+  const totalPages = Math.ceil(filteredRequests.length / pageSize)
+
+  const safeCurrentPage = Math.min(currentPage, Math.max(totalPages, 1))
+
+  const startIndex = (safeCurrentPage - 1) * pageSize
+
+  const paginatedRequests = filteredRequests.slice(
+    startIndex,
+    startIndex + pageSize,
+  )
+
+  const endIndex = Math.min(
+    startIndex + pageSize,
+    filteredRequests.length,
+  )
+
   const pendingCount = requests.filter(
     (request) => request.status === 'PENDING',
   ).length
