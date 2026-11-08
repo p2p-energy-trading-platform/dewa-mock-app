@@ -9,6 +9,11 @@ import { nitro } from 'nitro/vite'
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
+  server: {
+    host: '0.0.0.0',
+    port: 3001,
+    allowedHosts: true,
+  },
   plugins: [
     devtools(),
     nitro({ serverDir: './server', rollupConfig: { external: [/^@sentry\//] } }),
