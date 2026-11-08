@@ -138,9 +138,10 @@ function Home() {
             <SlidersHorizontal className="size-4 text-slate-400" />
             <Select
               value={statusFilter}
-              onValueChange={(value) =>
+              onValueChange={(value) => {
                 setStatusFilter(value as typeof statusFilter)
-              }
+                setCurrentPage(1)
+              }}
             >
               <SelectTrigger className="w-[150px] border-0 shadow-none focus:ring-0">
                 <SelectValue placeholder="All statuses" />
