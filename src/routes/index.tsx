@@ -160,6 +160,10 @@ function Home() {
           <p className="text-sm text-slate-500">
             Showing{' '}
             <span className="font-semibold text-slate-700">
+              {filteredRequests.length > 0 ? startIndex + 1 : 0}–{endIndex}
+            </span>{' '}
+            of{' '}
+            <span className="font-semibold text-slate-700">
               {filteredRequests.length}
             </span>{' '}
             {filteredRequests.length === 1 ? 'request' : 'requests'}
