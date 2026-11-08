@@ -221,6 +221,60 @@ function Home() {
             </p>
           </div>
         )}
+
+        {/* Pagination controls */}
+        {!isLoading && !isError && filteredRequests.length > 0 && (
+          <div className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
+            {/* Page size selection */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-slate-500">Rows per page:</span>
+
+              <Select
+                value={String(pageSize)}
+                onValueChange={(value) => {
+                  setPageSize(Number(value))
+                  setCurrentPage(1)
+                }}
+              >
+                <SelectTrigger className="w-[80px]">
+                  <SelectValue />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value="6">6</SelectItem>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Page navigation */}
+            <div className="flex items-center gap-3">
+              <p className="text-sm text-slate-500">
+                Page {safeCurrentPage} of {totalPages}
+              </p>
+
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={safeCurrentPage <= 1}
+                onClick={() => setCurrentPage((page) => page - 1)}
+              >
+                Previous
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={safeCurrentPage >= totalPages}
+                onClick={() => setCurrentPage((page) => page + 1)}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}  
+
         <RequestDialog
           request={selectedRequest}
           open={selectedRequest !== null}
