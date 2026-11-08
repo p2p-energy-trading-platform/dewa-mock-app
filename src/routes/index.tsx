@@ -86,6 +86,13 @@ function Home() {
     filteredRequests.length,
   )
 
+
+  useEffect(() => {
+    if (currentPage !== safeCurrentPage) {
+      setCurrentPage(safeCurrentPage)
+    }
+  }, [currentPage, safeCurrentPage])
+
   const pendingCount = requests.filter(
     (request) => request.status === 'PENDING',
   ).length
