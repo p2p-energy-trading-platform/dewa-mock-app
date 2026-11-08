@@ -126,7 +126,10 @@ function Home() {
             <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
             <Input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => {
+                setSearch(event.target.value)
+                setCurrentPage(1)
+              }}
               placeholder="Search by request, meter, or registration ID"
               className="border-0 pl-9 shadow-none focus-visible:ring-0"
             />
