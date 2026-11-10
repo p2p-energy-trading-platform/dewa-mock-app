@@ -68,8 +68,6 @@ function Home() {
     })
   }, [requests, search, statusFilter])
 
-
-
   const totalPages = Math.ceil(filteredRequests.length / pageSize)
 
   const safeCurrentPage = Math.min(currentPage, Math.max(totalPages, 1))
@@ -81,11 +79,7 @@ function Home() {
     startIndex + pageSize,
   )
 
-  const endIndex = Math.min(
-    startIndex + pageSize,
-    filteredRequests.length,
-  )
-
+  const endIndex = Math.min(startIndex + pageSize, filteredRequests.length)
 
   useEffect(() => {
     if (currentPage !== safeCurrentPage) {
@@ -273,7 +267,7 @@ function Home() {
               </Button>
             </div>
           </div>
-        )}  
+        )}
 
         <RequestDialog
           request={selectedRequest}
