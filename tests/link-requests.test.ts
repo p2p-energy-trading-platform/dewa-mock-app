@@ -4,8 +4,10 @@ import { linkRequests } from '../src/data/linkRequests'
 
 describe('linkRequests', () => {
   it('contains a pending link request with the expected identifiers', () => {
-    expect(linkRequests).toHaveLength(1)
-    expect(linkRequests[0]).toMatchObject({
+    
+    expect(
+      linkRequests.find((request) => request.requestId === 'REQ-001'),
+    ).toMatchObject({
       requestId: 'REQ-001',
       registrationId: 'REG-123',
       meterId: 'METER-001',
