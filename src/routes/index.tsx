@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
@@ -43,6 +43,9 @@ function Home() {
     'ALL',
   )
 
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(6)
+
   const filteredRequests = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
 
@@ -64,6 +67,25 @@ function Home() {
       return matchesStatus && matchesSearch
     })
   }, [requests, search, statusFilter])
+
+  const totalPages = Math.ceil(filteredRequests.length / pageSize)
+
+  const safeCurrentPage = Math.min(currentPage, Math.max(totalPages, 1))
+
+  const startIndex = (safeCurrentPage - 1) * pageSize
+
+  const paginatedRequests = filteredRequests.slice(
+    startIndex,
+    startIndex + pageSize,
+  )
+
+  const endIndex = Math.min(startIndex + pageSize, filteredRequests.length)
+
+  useEffect(() => {
+    if (currentPage !== safeCurrentPage) {
+      setCurrentPage(safeCurrentPage)
+    }
+  }, [currentPage, safeCurrentPage])
 
   const pendingCount = requests.filter(
     (request) => request.status === 'PENDING',
@@ -98,7 +120,10 @@ function Home() {
             <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
             <Input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => {
+                setSearch(event.target.value)
+                setCurrentPage(1)
+              }}
               placeholder="Search by request, meter, or registration ID"
               className="border-0 pl-9 shadow-none focus-visible:ring-0"
             />
@@ -107,9 +132,10 @@ function Home() {
             <SlidersHorizontal className="size-4 text-slate-400" />
             <Select
               value={statusFilter}
-              onValueChange={(value) =>
+              onValueChange={(value) => {
                 setStatusFilter(value as typeof statusFilter)
-              }
+                setCurrentPage(1)
+              }}
             >
               <SelectTrigger className="w-[150px] border-0 shadow-none focus:ring-0">
                 <SelectValue placeholder="All statuses" />
@@ -128,6 +154,10 @@ function Home() {
           <p className="text-sm text-slate-500">
             Showing{' '}
             <span className="font-semibold text-slate-700">
+              {filteredRequests.length > 0 ? startIndex + 1 : 0}–{endIndex}
+            </span>{' '}
+            of{' '}
+            <span className="font-semibold text-slate-700">
               {filteredRequests.length}
             </span>{' '}
             {filteredRequests.length === 1 ? 'request' : 'requests'}
@@ -139,6 +169,7 @@ function Home() {
               onClick={() => {
                 setSearch('')
                 setStatusFilter('ALL')
+                setCurrentPage(1)
               }}
               className="text-blue-600 hover:text-blue-700"
             >
@@ -168,7 +199,7 @@ function Home() {
           </div>
         ) : filteredRequests.length > 0 ? (
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {filteredRequests.map((request) => (
+            {paginatedRequests.map((request) => (
               <LinkRequestCard
                 key={request.requestId}
                 request={request}
@@ -184,6 +215,60 @@ function Home() {
             </p>
           </div>
         )}
+
+        {/* Pagination controls */}
+        {!isLoading && !isError && filteredRequests.length > 0 && (
+          <div className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
+            {/* Page size selection */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-slate-500">Rows per page:</span>
+
+              <Select
+                value={String(pageSize)}
+                onValueChange={(value) => {
+                  setPageSize(Number(value))
+                  setCurrentPage(1)
+                }}
+              >
+                <SelectTrigger className="w-[80px]">
+                  <SelectValue />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value="6">6</SelectItem>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Page navigation */}
+            <div className="flex items-center gap-3">
+              <p className="text-sm text-slate-500">
+                Page {safeCurrentPage} of {totalPages}
+              </p>
+
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={safeCurrentPage <= 1}
+                onClick={() => setCurrentPage((page) => page - 1)}
+              >
+                Previous
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={safeCurrentPage >= totalPages}
+                onClick={() => setCurrentPage((page) => page + 1)}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
+
         <RequestDialog
           request={selectedRequest}
           open={selectedRequest !== null}
