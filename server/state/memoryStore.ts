@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto'
-import { linkRequests as sampleLinkRequests } from '../../src/data/linkRequests'
 
 export type LinkRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 
@@ -19,12 +18,7 @@ export type NewLinkRequest = Pick<
   'registrationId' | 'meterId' | 'userReference'
 >
 
-export const pendingRequests: LinkRequest[] = sampleLinkRequests.map(
-  (request) => ({
-    ...request,
-    createdAt: new Date().toISOString(),
-  }),
-)
+export const pendingRequests: LinkRequest[] = []
 
 export function addLinkRequest(request: NewLinkRequest): LinkRequest {
   const newRequest: LinkRequest = {
